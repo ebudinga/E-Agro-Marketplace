@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="max-height: 500px; object-fit: cover;">
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">{{ product.name }}</h2>
+                    <p class="text-success fs-4">₦ {{ product.price }} per kg</p>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>
+                            <span class="farmer-badge">Farmer</span>
+                            <strong>{{ product.farmer.username }}</strong>
+                        </div>
+                        <div>
+                            <span class="badge bg-{% if product.is_available %}success{% else %}danger{% endif %}">
+                                {% if product.is_available %}Available{% else %}Out of Stock{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <p class="card-text">{{ product.description }}</p>
+                    
+                    <div class="mb-4">
+                        <h5>Product Details</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong>Available Quantity:</strong> {{ product.quantity }} kg
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Added:</strong> {{ product.created_at|date:"M d, Y" }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Location:</strong> {{ product.farmer.location }}
+                            </li>
+                            {% if product.category %}
+                            <li class="list-group-item">
+                                <strong>Category:</strong> {{ product.category.name }}
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    
+                    {% if user.is_authenticated and user.is_buyer and product.is_available %}
+                        <div class="border-top pt-3">
+                            <h5>Add to Cart</h5>
+                            <form method="post" action="{% url 'add_to_cart' product.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success w-100 mt-3">
+                                    <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                                </button>
+                            </form>
+                        </div>
+                    {% elif not product.is_available %}
+                        <div class="alert alert-warning">
+                            This product is currently out of stock. Please check back later.
+                        </div>
+                    {% elif not user.is_authenticated %}
+                        <div class="alert alert-info">
+                            <a href="{% url 'login' %}?next={% url 'product_detail' product.id %}" class="alert-link">
+                                Login as a buyer
+                            </a> to purchase this product.
+                        </div>
+                    {% endif %}
+                    
+                    {% if user.is_authenticated and user == product.farmer %}
+                        <div class="border-top pt-3">
+                            <h5>Farmer Actions</h5>
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'edit_product' product.id %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit me-2"></i>Edit Product
+                                </a>
+                                <a href="{% url 'delete_product' product.id %}" class="btn btn-outline-danger">
+                                    <i class="fas fa-trash me-2"></i>Delete Product
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Back button -->
+    <div class="mt-4">
+        <a href="{% url 'marketplace' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Marketplace
+        </a>
+    </div>
+</div>
+{% endblock %}

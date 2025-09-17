@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white text-center">
+                    <h2>Create Your Account</h2>
+                    <p class="mb-0">Join as Farmer or Buyer</p>
+                </div>
+                
+                <!-- Error Messages -->
+                {% if form.errors %}
+                <div class="alert alert-danger mx-3 mt-3">
+                    <strong>Please fix these errors:</strong>
+                    <ul class="mb-0">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">Username</label>
+                            <input type="text" name="username" id="id_username" 
+                                   class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                                   value="{{ form.username.value|default:'' }}" required>
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.username.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label">Email Address</label>
+                            <input type="email" name="email" id="id_email" 
+                                   class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                                   value="{{ form.email.value|default:'' }}" required>
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.email.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Phone Number -->
+                        <div class="mb-3">
+                            <label for="id_phone_number" class="form-label">Phone Number</label>
+                            <input type="text" name="phone_number" id="id_phone_number" 
+                                   class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}" 
+                                   value="{{ form.phone_number.value|default:'' }}" required>
+                            <div class="form-text">We'll use this to contact you about orders</div>
+                            {% if form.phone_number.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.phone_number.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Location -->
+                        <div class="mb-3">
+                            <label for="id_location" class="form-label">Location</label>
+                            <input type="text" name="location" id="id_location" 
+                                   class="form-control {% if form.location.errors %}is-invalid{% endif %}" 
+                                   value="{{ form.location.value|default:'' }}" required>
+                            <div class="form-text">City or region where you're based</div>
+                            {% if form.location.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.location.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Account Type -->
+                        <div class="mb-4">
+                            <label class="form-label">Account Type</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check flex-grow-1">
+                                    <input class="form-check-input" type="radio" name="user_type" 
+                                           id="id_user_type_farmer" value="FARMER" 
+                                           {% if form.user_type.value == 'FARMER' %}checked{% endif %}>
+                                    <label class="form-check-label d-block p-3 border rounded" for="id_user_type_farmer">
+                                        <strong>Farmer</strong>
+                                        <p class="small mb-0">Sell your farm produce directly to buyers</p>
+                                    </label>
+                                </div>
+                                <div class="form-check flex-grow-1">
+                                    <input class="form-check-input" type="radio" name="user_type" 
+                                           id="id_user_type_buyer" value="BUYER"
+                                           {% if form.user_type.value == 'BUYER' %}checked{% endif %}>
+                                    <label class="form-check-label d-block p-3 border rounded" for="id_user_type_buyer">
+                                        <strong>Buyer</strong>
+                                        <p class="small mb-0">Purchase fresh produce directly from farmers</p>
+                                    </label>
+                                </div>
+                            </div>
+                            {% if form.user_type.errors %}
+                                <div class="text-danger small">{{ form.user_type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Password 1 -->
+                        <div class="mb-3">
+                            <label for="id_password1" class="form-label">Password</label>
+                            <input type="password" name="password1" id="id_password1" 
+                                   class="form-control {% if form.password1.errors %}is-invalid{% endif %}" required>
+                            {% if form.password1.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.password1.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Password 2 -->
+                        <div class="mb-4">
+                            <label for="id_password2" class="form-label">Confirm Password</label>
+                            <input type="password" name="password2" id="id_password2" 
+                                   class="form-control {% if form.password2.errors %}is-invalid{% endif %}" required>
+                            {% if form.password2.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.password2.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Terms -->
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="terms" required
+                                   {% if form.terms.value %}checked{% endif %}>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-success w-100 py-2">Create Account</button>
+                    </form>
+                    
+                    <!-- Login Link -->
+                    <div class="mt-4 text-center">
+                        <p class="mb-0">Already have an account? 
+                            <a href="{% url 'login' %}" class="text-success">Log In</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for better error display -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add real-time validation
+    const fields = document.querySelectorAll('input');
+    fields.forEach(field => {
+        field.addEventListener('blur', function() {
+            if (this.checkValidity()) {
+                this.classList.remove('is-invalid');
+            } else {
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+    
+    // Show password requirements on focus
+    const password1 = document.getElementById('id_password1');
+    password1.addEventListener('focus', function() {
+        const helpText = document.createElement('div');
+        helpText.className = 'form-text';
+        helpText.innerHTML = `
+            <p class="small mb-1">Password must contain:</p>
+            <ul class="small">
+                <li>At least 8 characters</li>
+                <li>Not entirely numeric</li>
+                <li>Not too common</li>
+            </ul>
+        `;
+        this.parentNode.appendChild(helpText);
+    });
+});
+</script>
+{% endblock %}
