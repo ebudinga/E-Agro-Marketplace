@@ -1,81 +1,87 @@
 {% extends 'base.html' %}
+{% block title %}Checkout{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2 class="mb-4">Checkout</h2>
-    
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Order Summary</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in cart.items.all %}
-                                <tr>
-                                    <td>{{ item.product.name }}</td>
-                                    <td>₦ {{ item.product.price }}</td>
-                                    <td>{{ item.quantity }}</td>
-                                    <td>₦ {{ item.total_price }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="3" class="text-end fw-bold">Total:</td>
-                                    <td class="fw-bold">₦ {{ cart.total_price }}</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
+<h2 class="fw-bold mb-4">Checkout</h2>
+
+<div class="row g-4">
+  <div class="col-md-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-success text-white"><h5 class="mb-0">Order Summary</h5></div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table mb-0">
+            <thead class="table-light">
+              <tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th></tr>
+            </thead>
+            <tbody>
+              {% for item in cart.items.all %}
+              <tr>
+                <td>{{ item.product.name }}</td>
+                <td>₦{{ item.product.price }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₦{{ item.total_price }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+              <tr>
+                <td colspan="3" class="text-end fw-bold">Total</td>
+                <td class="fw-bold">₦{{ cart.total_price }}</td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
-        
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Complete Your Order</h5>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Payment Method</label>
-                            {% for value, name in form.payment_method.field.choices %}
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="payment_method" id="payment_{{ value }}" value="{{ value }}" required>
-                                <label class="form-check-label" for="payment_{{ value }}">
-                                    {{ name }}
-                                </label>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="id_delivery_address" class="form-label">Delivery Address</label>
-                            <textarea name="delivery_address" id="id_delivery_address" class="form-control" rows="3" required placeholder="Enter your complete delivery address"></textarea>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-success btn-lg">Place Order</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
+
+  <div class="col-md-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-success text-white"><h5 class="mb-0">Complete Your Order</h5></div>
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-4">
+            <label class="form-label fw-bold">Payment Method</label>
+            {% for value, name in form.fields.payment_method.choices %}
+            <div class="form-check border rounded p-3 mb-2">
+              <input class="form-check-input" type="radio" name="payment_method"
+                     id="payment_{{ value }}" value="{{ value }}" required>
+              <label class="form-check-label w-100" for="payment_{{ value }}">
+                {% if value == 'PAYSTACK' %}
+                  <i class="fas fa-credit-card text-success me-2"></i>
+                {% elif value == 'CASH' %}
+                  <i class="fas fa-money-bill-wave text-success me-2"></i>
+                {% else %}
+                  <i class="fas fa-university text-success me-2"></i>
+                {% endif %}
+                <strong>{{ name }}</strong>
+                {% if value == 'PAYSTACK' %}
+                  <div class="small text-muted">Secure card / bank transfer / USSD via Paystack</div>
+                {% endif %}
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label for="id_delivery_address" class="form-label fw-bold">Delivery Address</label>
+            <textarea name="delivery_address" id="id_delivery_address"
+                      class="form-control" rows="3" required
+                      placeholder="Enter your complete delivery address"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-success btn-lg w-100">
+            <i class="fas fa-lock me-2"></i>Place Order
+          </button>
+          <p class="small text-muted text-center mt-3 mb-0">
+            If you choose Paystack, you'll be redirected to a secure payment page.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

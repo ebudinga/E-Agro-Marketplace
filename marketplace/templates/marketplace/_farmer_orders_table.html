@@ -1,0 +1,37 @@
+{% for order in orders %}
+<tr>
+  <td><strong>{{ order.order_id }}</strong></td>
+  <td>{{ order.product.name }}</td>
+  <td>
+    {{ order.buyer.username }}
+    <br><small class="text-muted">{{ order.buyer.email }}</small>
+  </td>
+  <td>{{ order.buyer_phone|default:order.buyer.phone_number }}</td>
+  <td><small>{{ order.delivery_address|truncatewords:4 }}</small></td>
+  <td>{{ order.quantity }} kg</td>
+  <td>₦{{ order.total_price }}</td>
+  <td>
+    <span class="badge bg-{% if order.payment_status == 'PAID' %}success{% else %}secondary{% endif %}">
+      {{ order.get_payment_status_display }}
+    </span>
+    <br><small class="text-muted">{{ order.get_payment_method_display }}</small>
+  </td>
+  <td>
+    <span class="badge bg-{% if order.status == 'PENDING' %}warning{% elif order.status == 'CONFIRMED' %}info{% elif order.status == 'DELIVERED' %}success{% else %}secondary{% endif %}">
+      {{ order.get_status_display }}
+    </span>
+  </td>
+  <td>
+    <form method="post" action="{% url 'update_order_status' order.id %}">
+      {% csrf_token %}
+      <select name="status" onchange="this.form.submit()" class="form-select form-select-sm">
+        {% for value, label in order.STATUS_CHOICES %}
+        <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </td>
+</tr>
+{% empty %}
+<tr><td colspan="10" class="text-center py-4 text-muted">No orders yet.</td></tr>
+{% endfor %}

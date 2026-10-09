@@ -1,0 +1,50 @@
+{% for product in products %}
+<div class="col-md-4 mb-4">
+  <div class="card h-100 product-card border-0 shadow-sm">
+    <div class="position-relative">
+      <img src="{{ product.image.url }}" class="card-img-top"
+           alt="{{ product.name }}" style="height:200px;object-fit:cover;">
+      {% if product.category %}
+      <span class="category-badge position-absolute top-0 start-0 m-2">{{ product.category.name }}</span>
+      {% endif %}
+    </div>
+    <div class="card-body">
+      <h6 class="card-title fw-bold mb-1">{{ product.name }}</h6>
+      <p class="text-success fw-bold mb-2">₦{{ product.price }} <small class="text-muted">/kg</small></p>
+      <p class="small text-muted mb-1">
+        <i class="fas fa-user-tie me-1"></i>{{ product.farmer.username }}
+      </p>
+      {% if product.farmer.location %}
+      <p class="small text-muted mb-2">
+        <i class="fas fa-map-marker-alt me-1"></i>{{ product.farmer.location }}
+      </p>
+      {% endif %}
+      <p class="small mb-0">{{ product.description|truncatewords:12 }}</p>
+    </div>
+    <div class="card-footer bg-white border-0">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="badge bg-light text-dark">
+          <i class="fas fa-box me-1"></i>{{ product.quantity }} kg
+        </span>
+        <div class="btn-group">
+          <a href="{% url 'product_detail' product.id %}" class="btn btn-sm btn-outline-success">Details</a>
+          {% if user.is_buyer and product.is_available %}
+          <button class="btn btn-sm btn-success"
+                  hx-post="{% url 'add_to_cart' product.id %}"
+                  hx-swap="none">
+            <i class="fas fa-cart-plus"></i>
+          </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% empty %}
+<div class="col-12">
+  <div class="alert alert-info text-center mb-0">
+    No products found.
+    {% if user.is_farmer %}Be the first to <a href="{% url 'add_product' %}" class="alert-link">add a product</a>!{% endif %}
+  </div>
+</div>
+{% endfor %}

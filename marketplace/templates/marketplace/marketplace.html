@@ -1,93 +1,63 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block title %}Marketplace{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h2>Farm Produce Marketplace</h2>
-            <p class="text-muted">Browse fresh produce directly from farmers</p>
-        </div>
-        <div class="col-md-4">
-            <form method="get" class="d-flex">
-                <input type="text" name="q" class="form-control me-2" placeholder="Search products..." value="{{ query }}">
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
-        </div>
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2 class="fw-bold mb-1">Farm Produce Marketplace</h2>
+    <p class="text-muted mb-0">Browse fresh produce directly from farmers</p>
+  </div>
+  <div class="col-md-4 mt-3 mt-md-0">
+    <div class="input-group">
+      <input type="search"
+             name="q"
+             class="form-control"
+             placeholder="Search tomatoes, maize, rice…"
+             value="{{ query }}"
+             hx-get="{% url 'marketplace' %}"
+             hx-trigger="keyup changed delay:300ms, search"
+             hx-target="#product-grid"
+             hx-swap="innerHTML"
+             hx-indicator="#search-spinner">
+      <span class="input-group-text bg-white">
+        <span id="search-spinner" class="htmx-indicator spinner-border spinner-border-sm text-success"></span>
+        <i class="fas fa-search text-success ms-1"></i>
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Sidebar -->
+  <div class="col-md-3 mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold">Categories</div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item {% if not selected_category %}fw-bold text-success{% endif %}">
+          <a href="{% url 'marketplace' %}" class="text-decoration-none text-reset d-block">All products</a>
+        </li>
+        {% for c in categories %}
+        <li class="list-group-item {% if selected_category == c.id|stringformat:'s' %}fw-bold text-success{% endif %}">
+          <a href="?category={{ c.id }}" class="text-decoration-none text-reset d-block">{{ c.name }}</a>
+        </li>
+        {% endfor %}
+      </ul>
     </div>
 
-    <div class="row">
-        <!-- Categories Sidebar -->
-        <div class="col-md-3 mb-4">
-            
-
-            {% if user.is_farmer %}
-            <div class="mt-4">
-                <a href="{% url 'add_product' %}" class="btn btn-success w-100">
-                    <i class="fas fa-plus me-2"></i>Add Product
-                </a>
-                <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline-success w-100 mt-2">
-                    <i class="fas fa-tachometer-alt me-2"></i>My Dashboard
-                </a>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- Products Listing -->
-        <div class="col-md-9">
-            <div class="row">
-                {% for product in products %}
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 product-card">
-                        <div class="position-relative">
-                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
-                            {% if product.category %}
-                            <span class="category-badge position-absolute top-0 start-0 m-2">{{ product.category.name }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title">{{ product.name }}</h5>
-                            <p class="card-text text-success fw-bold">₦ {{ product.price }}</p>
-                            <p class="card-text text-muted small">
-                                <span class="farmer-badge">Farmer</span> {{ product.farmer.username }}
-                            </p>
-                            <p class="card-text text-muted small">
-                                <i class="fas fa-map-marker-alt me-1"></i> {{ product.farmer.location }}
-                            </p>
-                            <p class="card-text small">{{ product.description|truncatewords:15 }}</p>
-                        </div>
-                        <div class="card-footer bg-white">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="badge bg-light text-dark">
-                                    <i class="fas fa-box me-1"></i> {{ product.quantity }} available
-                                </span>
-                                <div>
-                                    <a href="{% url 'product_detail' product.id %}" class="btn btn-sm btn-outline-success">
-                                        Details
-                                    </a>
-                                    {% if user.is_buyer and product.is_available %}
-                                    <a href="{% url 'add_to_cart' product.id %}" class="btn btn-sm btn-success ms-1">
-                                        <i class="fas fa-cart-plus"></i>
-                                    </a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="col-12">
-                    <div class="alert alert-info text-center">
-                        No products found. {% if user.is_farmer %}Be the first to <a href="{% url 'add_product' %}" class="alert-link">add a product</a>!{% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+    {% if user.is_farmer %}
+    <div class="mt-3 d-grid gap-2">
+      <a href="{% url 'add_product' %}" class="btn btn-success"><i class="fas fa-plus me-2"></i>Add Product</a>
+      <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline-success"><i class="fas fa-tachometer-alt me-2"></i>My Dashboard</a>
     </div>
+    {% endif %}
+  </div>
+
+  <!-- Grid (HTMX target) -->
+  <div class="col-md-9">
+    <div id="product-grid" class="row">
+      {% include 'marketplace/_product_grid.html' %}
+    </div>
+  </div>
 </div>
 {% endblock %}

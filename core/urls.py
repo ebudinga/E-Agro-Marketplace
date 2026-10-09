@@ -9,11 +9,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('marketplace/', include('marketplace.urls')),
-    path('auth/', include('django.contrib.auth.urls')),
     path('register/', views.register, name='register'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+    path('login/', views.CustomLoginView.as_view(), name='login'),
+    path('logout/', views.custom_logout, name='logout'),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

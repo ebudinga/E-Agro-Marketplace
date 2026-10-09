@@ -1,82 +1,102 @@
 {% extends 'base.html' %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white text-center">
-                    <h2>Welcome Back to E-Agro</h2>
-                    <p class="mb-0">Login to continue to your account</p>
-                </div>
-                <div class="card-body p-4">
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label for="id_username" class="form-label">Username or Email</label>
-                            <input type="text" name="username" id="id_username" 
-                                   class="form-control" required autofocus>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="id_password" class="form-label">Password</label>
-                            <input type="password" name="password" id="id_password" 
-                                   class="form-control" required>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="remember">
-                                <label class="form-check-label" for="remember">
-                                    Remember me
-                                </label>
-                            </div>
-                            <a href="#" class="text-success">Forgot password?</a>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-success w-100 py-2">Log In</button>
-                    </form>
-                    
-                    <div class="mt-4 text-center">
-                        <p class="mb-0">Don't have an account? 
-                            <a href="{% url 'register' %}" class="text-success">Register Now</a>
-                        </p>
-                    </div>
-                    
-                    <div class="position-relative my-4">
-                        <hr>
-                        <div class="position-absolute top-50 start-50 translate-middle bg-white px-2">
-                            Or continue with
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-secondary">
-                            <i class="fab fa-google me-2"></i> Sign in with Google
-                        </button>
-                        <button class="btn btn-outline-primary">
-                            <i class="fab fa-facebook me-2"></i> Sign in with Facebook
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-4 text-center">
-                <div class="d-flex justify-content-center gap-4">
-                    <div class="border-end pe-4">
-                        <h5 class="text-success">Farmers</h5>
-                        <p class="small mb-0">Manage your products</p>
-                        <p class="small mb-0">Track your orders</p>
-                    </div>
-                    <div>
-                        <h5 class="text-success">Buyers</h5>
-                        <p class="small mb-0">Browse fresh produce</p>
-                        <p class="small mb-0">Place orders securely</p>
-                    </div>
-                </div>
-            </div>
+<div class="row justify-content-center py-4">
+  <div class="col-md-6 col-lg-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-success text-white text-center py-3">
+        <h3 class="mb-0"><i class="fas fa-seedling me-2"></i>Welcome Back</h3>
+        <p class="mb-0 small">Login to continue to your E-Agro account</p>
+      </div>
+      <div class="card-body p-4">
+        {% if form.errors %}
+        <div class="alert alert-danger py-2">
+          <small>Invalid username or password. Please try again.</small>
         </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label for="id_username" class="form-label fw-bold">Username or Email</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white"><i class="fas fa-user text-success"></i></span>
+              <input type="text" name="username" id="id_username"
+                     class="form-control" required autofocus autocomplete="username"
+                     placeholder="Enter your username">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="id_password" class="form-label fw-bold">Password</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white"><i class="fas fa-lock text-success"></i></span>
+              <input type="password" name="password" id="id_password"
+                     class="form-control" required autocomplete="current-password"
+                     placeholder="Enter your password">
+              <button class="btn btn-outline-secondary" type="button"
+                      onclick="togglePassword('id_password', this)">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="remember">
+              <label class="form-check-label small" for="remember">Remember me</label>
+            </div>
+            <a href="#" class="text-success small">Forgot password?</a>
+          </div>
+
+          {% if next %}
+            <input type="hidden" name="next" value="{{ next }}">
+          {% endif %}
+
+          <button type="submit" class="btn btn-success w-100 py-2">
+            <i class="fas fa-sign-in-alt me-2"></i>Log In
+          </button>
+        </form>
+
+        <div class="text-center mt-4">
+          <p class="mb-0 small">
+            Don't have an account?
+            <a href="{% url 'register' %}" class="text-success fw-bold">Register Now</a>
+          </p>
+        </div>
+      </div>
     </div>
+
+    <div class="mt-4 text-center">
+      <div class="d-flex justify-content-center gap-4">
+        <div class="border-end pe-4">
+          <h6 class="text-success mb-1"><i class="fas fa-tractor me-1"></i>Farmers</h6>
+          <p class="small text-muted mb-0">Manage products & track orders</p>
+        </div>
+        <div>
+          <h6 class="text-success mb-1"><i class="fas fa-shopping-basket me-1"></i>Buyers</h6>
+          <p class="small text-muted mb-0">Browse fresh produce</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script>
+function togglePassword(id, btn) {
+  const input = document.getElementById(id);
+  const icon = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+}
+</script>
 {% endblock %}

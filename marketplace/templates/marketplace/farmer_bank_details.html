@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Payout Settings{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-success text-white">
+        <h4 class="mb-0"><i class="fas fa-university me-2"></i>Payout Settings</h4>
+      </div>
+      <div class="card-body">
+        {% if subaccount and subaccount.is_verified %}
+        <div class="alert alert-success">
+          <i class="fas fa-check-circle me-2"></i>
+          Your bank account is connected. Payouts will be sent automatically after each sale.
+          <br><small class="text-muted">Subaccount: {{ subaccount.subaccount_code }}</small>
+        </div>
+        {% else %}
+        <div class="alert alert-warning">
+          Add your Nigerian bank account so we can pay you when buyers purchase your products.
+        </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Business / Farm Name</label>
+            {{ form.business_name }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Bank</label>
+            {{ form.bank_code }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Account Number</label>
+            {{ form.account_number }}
+            <div class="form-text">10-digit NUBAN account number.</div>
+          </div>
+          <div class="mb-3 text-muted small">
+            Platform commission: <strong>{{ subaccount.percentage_charge|default:'5.00' }}%</strong>.
+            The rest goes directly to your bank.
+          </div>
+          <button class="btn btn-success w-100 py-2">
+            <i class="fas fa-save me-2"></i>Save Payout Details
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

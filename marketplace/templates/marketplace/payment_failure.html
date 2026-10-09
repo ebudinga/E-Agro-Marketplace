@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Payment Failed{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+  <i class="fas fa-times-circle fa-5x text-danger mb-4"></i>
+  <h2 class="fw-bold">Payment Not Completed</h2>
+  <p class="lead">We couldn't confirm your payment.</p>
+  <p class="text-muted">Reference: <code>{{ reference }}</code></p>
+  <div class="mt-4 d-flex justify-content-center gap-3">
+    <a href="{% url 'view_cart' %}" class="btn btn-success">Try Again</a>
+    <a href="{% url 'buyer_dashboard' %}" class="btn btn-outline-secondary">My Orders</a>
+  </div>
+</div>
+{% endblock %}

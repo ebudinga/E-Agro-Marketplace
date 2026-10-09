@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-6">
+    <img src="{{ product.image.url }}" class="img-fluid rounded shadow-sm"
+         alt="{{ product.name }}" style="max-height:520px;width:100%;object-fit:cover;">
+  </div>
+
+  <div class="col-md-6">
+    <h2 class="fw-bold">{{ product.name }}</h2>
+    <p class="fs-3 text-success fw-bold mb-3">₦{{ product.price }} <small class="fs-6 text-muted">/kg</small></p>
+
+    <div class="d-flex justify-content-between mb-3">
+      <div>
+        <span class="farmer-badge me-2">Farmer</span>
+        <strong>{{ product.farmer.username }}</strong>
+        {% if product.farmer.location %}
+        <span class="text-muted small ms-2"><i class="fas fa-map-marker-alt"></i> {{ product.farmer.location }}</span>
+        {% endif %}
+      </div>
+      <span class="badge bg-{% if product.is_available %}success{% else %}danger{% endif %}">
+        {% if product.is_available %}Available{% else %}Out of Stock{% endif %}
+      </span>
+    </div>
+
+    <p>{{ product.description }}</p>
+
+    <ul class="list-group list-group-flush mb-3">
+      <li class="list-group-item d-flex justify-content-between">
+        <span class="text-muted">Available</span>
+        <strong>{{ product.quantity }} kg</strong>
+      </li>
+      <li class="list-group-item d-flex justify-content-between">
+        <span class="text-muted">Added</span>
+        <strong>{{ product.created_at|date:"M d, Y" }}</strong>
+      </li>
+      {% if product.category %}
+      <li class="list-group-item d-flex justify-content-between">
+        <span class="text-muted">Category</span>
+        <strong>{{ product.category.name }}</strong>
+      </li>
+      {% endif %}
+    </ul>
+
+    {% if user.is_authenticated and user.is_buyer and product.is_available %}
+      <form method="post" action="{% url 'add_to_cart' product.id %}" class="row g-2">
+        {% csrf_token %}
+        <div class="col-12">
+          <button type="submit" class="btn btn-success w-100 py-2">
+            <i class="fas fa-cart-plus me-2"></i>Add to Cart
+          </button>
+        </div>
+      </form>
+      {% if product.farmer.phone_number %}
+      <a class="btn btn-outline-success w-100 mt-2"
+         target="_blank"
+         href="https://wa.me/{{ product.farmer.phone_number }}?text=Hi%20{{ product.farmer.username|urlencode }}%2C%20I%27m%20interested%20in%20{{ product.name|urlencode }}">
+        <i class="fab fa-whatsapp me-2"></i>Chat with Farmer
+      </a>
+      {% endif %}
+    {% elif not product.is_available %}
+      <div class="alert alert-warning">This product is currently out of stock.</div>
+    {% elif not user.is_authenticated %}
+      <div class="alert alert-info">
+        <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">Log in as a buyer</a> to purchase.
+      </div>
+    {% endif %}
+
+    {% if user.is_authenticated and user == product.farmer %}
+    <div class="border-top pt-3 mt-3">
+      <h6 class="fw-bold">Farmer Actions</h6>
+      <div class="d-grid gap-2">
+        <a href="{% url 'edit_product' product.id %}" class="btn btn-outline-primary">
+          <i class="fas fa-edit me-2"></i>Edit Product
+        </a>
+        <a href="{% url 'delete_product' product.id %}" class="btn btn-outline-danger">
+          <i class="fas fa-trash me-2"></i>Delete Product
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% if related_products %}
+<hr class="my-5">
+<h4 class="fw-bold mb-4">More from {{ product.farmer.username }}</h4>
+<div class="row g-4">
+  {% for p in related_products %}
+  <div class="col-md-3">
+    <div class="card product-card border-0 shadow-sm h-100">
+      <img src="{{ p.image.url }}" class="card-img-top" style="height:150px;object-fit:cover;" alt="{{ p.name }}">
+      <div class="card-body">
+        <h6 class="fw-bold mb-1">{{ p.name }}</h6>
+        <p class="text-success fw-bold mb-0">₦{{ p.price }}</p>
+      </div>
+      <div class="card-footer bg-white border-0">
+        <a href="{% url 'product_detail' p.id %}" class="btn btn-sm btn-outline-success w-100">View</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="mt-4">
+  <a href="{% url 'marketplace' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Back to Marketplace
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="rounded-4 p-5 mb-5 text-white position-relative overflow-hidden"
+         style="background:linear-gradient(135deg,#28a745 0%,#1e7e34 100%);">
+  <div class="row align-items-center">
+    <div class="col-lg-7">
+      <h1 class="display-4 fw-bold mb-3">Connecting Farmers Directly to Buyers</h1>
+      <p class="lead mb-4">
+        E-Agro eliminates middlemen, reduces post-harvest losses, and boosts farmer profits
+        while giving buyers fresh, affordable produce.
+      </p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg fw-bold px-4">
+          <i class="fas fa-tractor me-2"></i>Join as Farmer
+        </a>
+        <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg fw-bold px-4">
+          <i class="fas fa-shopping-basket me-2"></i>Shop as Buyer
+        </a>
+      </div>
+    </div>
+    <div class="col-lg-5 d-none d-lg-block">
+      <img src="{% static 'images/farm1.jpg' %}" class="img-fluid rounded-4 shadow-lg"
+           style="max-height:340px;object-fit:cover;width:100%;" alt="Fresh farm produce">
+    </div>
+  </div>
+</section>
+
+<section class="mb-5">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold">How E-Agro Works</h2>
+    <p class="text-muted">Simple. Direct. Fair.</p>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100 text-center p-4">
+        <div class="display-5 text-success mb-3"><i class="fas fa-seedling"></i></div>
+        <h5>Farmers List Products</h5>
+        <p class="text-muted mb-0">Farmers add fresh produce with photos, prices and quantity.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100 text-center p-4">
+        <div class="display-5 text-success mb-3"><i class="fas fa-mobile-alt"></i></div>
+        <h5>Buyers Place Orders</h5>
+        <p class="text-muted mb-0">Browse, order, and pay securely with Paystack.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100 text-center p-4">
+        <div class="display-5 text-success mb-3"><i class="fas fa-truck"></i></div>
+        <h5>Direct Delivery</h5>
+        <p class="text-muted mb-0">Farmers deliver fresh produce straight to buyers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mb-5">
+  <div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">Fresh Farm Produce</h2>
+      <p class="text-muted mb-0">Direct from our partner farmers</p>
+    </div>
+    <a href="{% url 'marketplace' %}" class="btn btn-outline-success">
+      View All <i class="fas fa-arrow-right ms-1"></i>
+    </a>
+  </div>
+
+  <div class="row g-4">
+    {% for product in products %}
+    <div class="col-md-4 col-lg-3">
+      <div class="card product-card border-0 shadow-sm h-100">
+        <div class="position-relative">
+          <img src="{{ product.image.url }}" class="card-img-top"
+               alt="{{ product.name }}" style="height:180px;object-fit:cover;">
+          <span class="badge bg-success position-absolute top-0 end-0 m-2">Fresh</span>
+        </div>
+        <div class="card-body">
+          <h6 class="fw-bold mb-1">{{ product.name }}</h6>
+          <p class="text-success fw-bold mb-1">₦{{ product.price }}<small class="text-muted">/kg</small></p>
+          <p class="small text-muted mb-2">
+            <i class="fas fa-user-tie me-1"></i>{{ product.farmer.username }}
+          </p>
+          <a href="{% url 'product_detail' product.id %}" class="btn btn-sm btn-outline-success w-100">
+            View Details
+          </a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="alert alert-info text-center mb-0">
+        No products yet. Check back soon!
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="rounded-4 p-5 text-center text-white mb-5"
+         style="background:linear-gradient(135deg,#1e7e34 0%,#28a745 100%);">
+  <h2 class="fw-bold mb-3">Join E-Agro Marketplace Today</h2>
+  <p class="lead mb-4">Sell smarter. Buy fresher. Support local farmers.</p>
+  <a href="{% url 'register' %}" class="btn btn-light btn-lg fw-bold px-5">Get Started</a>
+</section>
+{% endblock %}
