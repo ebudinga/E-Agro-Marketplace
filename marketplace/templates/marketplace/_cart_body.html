@@ -1,51 +1,76 @@
-{% for item in cart_items %}
-<tr>
-  <td>
-    <div class="d-flex align-items-center">
-      <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"
-           width="60" height="60" class="rounded me-3" style="object-fit:cover;">
-      <div>
-        <h6 class="mb-0">{{ item.product.name }}</h6>
-        <small class="text-muted">Sold by {{ item.product.farmer.username }}</small>
+{% load humanize %}
+{% if cart_items %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <section class="dashboard-card" aria-labelledby="cart-items-heading">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="h6 mb-0" id="cart-items-heading">Cart items</h2>
+        <span class="status-badge status-paid">{{ cart_items.count }} item{{ cart_items.count|pluralize }}</span>
       </div>
-    </div>
-  </td>
-  <td>₦{{ item.product.price }}</td>
-  <td>
-    <div class="btn-group" role="group">
-      <button class="btn btn-sm btn-outline-secondary"
-              hx-post="{% url 'update_cart_item' item.id %}"
-              hx-vals='{"action":"decrease"}'
-              hx-target="#cart-body"
-              hx-swap="innerHTML">−</button>
-      <span class="btn btn-sm btn-light disabled" style="min-width:44px;">{{ item.quantity }}</span>
-      <button class="btn btn-sm btn-outline-secondary"
-              hx-post="{% url 'update_cart_item' item.id %}"
-              hx-vals='{"action":"increase"}'
-              hx-target="#cart-body"
-              hx-swap="innerHTML">+</button>
-    </div>
-  </td>
-  <td class="fw-bold">₦{{ item.total_price }}</td>
-  <td>
-    <button class="btn btn-sm btn-outline-danger"
-            hx-post="{% url 'update_cart_item' item.id %}"
-            hx-vals='{"action":"remove"}'
-            hx-target="#cart-body"
-            hx-swap="innerHTML"
-            hx-confirm="Remove this item?">
-      <i class="fas fa-trash"></i>
-    </button>
-  </td>
-</tr>
-{% empty %}
-<tr>
-  <td colspan="5" class="text-center py-4 text-muted">Your cart is empty.</td>
-</tr>
-{% endfor %}
+      <div class="table-responsive">
+        <table class="table data-table align-middle">
+          <thead><tr><th>Produce</th><th>Price</th><th>Quantity</th><th>Total</th><th><span class="visually-hidden">Actions</span></th></tr></thead>
+          <tbody>
+            {% for item in cart_items %}
+            <tr>
+              <td>
+                <div class="cart-product">
+                  <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" loading="lazy">
+                  <div>
+                    <h3 class="h6 mb-1">{{ item.product.name }}</h3>
+                    <small class="text-muted">Sold by {{ item.product.farmer.username }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>₦{{ item.product.price|floatformat:2|intcomma }}</td>
+              <td>
+                <div class="quantity-control" role="group" aria-label="Quantity for {{ item.product.name }}">
+                  <button type="button" hx-post="{% url 'update_cart_item' item.id %}"
+                          hx-vals='{"action":"decrease"}' hx-target="#cart-panel" hx-swap="innerHTML"
+                          aria-label="Decrease {{ item.product.name }} quantity">−</button>
+                  <span aria-live="polite">{{ item.quantity }}</span>
+                  <button type="button" hx-post="{% url 'update_cart_item' item.id %}"
+                          hx-vals='{"action":"increase"}' hx-target="#cart-panel" hx-swap="innerHTML"
+                          aria-label="Increase {{ item.product.name }} quantity">+</button>
+                </div>
+              </td>
+              <td class="fw-bold">₦{{ item.total_price|floatformat:2|intcomma }}</td>
+              <td>
+                <button type="button" class="btn btn-sm btn-outline-danger"
+                        hx-post="{% url 'update_cart_item' item.id %}"
+                        hx-vals='{"action":"remove"}' hx-target="#cart-panel" hx-swap="innerHTML"
+                        hx-confirm="Remove this item?" aria-label="Remove {{ item.product.name }} from cart">
+                  <i class="fas fa-trash" aria-hidden="true"></i>
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 
-<tr class="table-light">
-  <td colspan="3" class="text-end fw-bold">Total:</td>
-  <td class="fw-bold">₦{{ cart.total_price }}</td>
-  <td></td>
-</tr>
+  <div class="col-lg-4">
+    <aside class="summary-card" aria-labelledby="summary-heading">
+      <div class="card-body p-4">
+        <h2 class="h5 mb-4" id="summary-heading">Order Summary</h2>
+        <div class="summary-row"><span>Items</span><span>{{ cart_items.count }}</span></div>
+        <div class="summary-row"><span>Subtotal</span><span>₦{{ cart.total_price|floatformat:2|intcomma }}</span></div>
+        <div class="summary-total"><span>Total</span><span>₦{{ cart.total_price|floatformat:2|intcomma }}</span></div>
+        <a href="{% url 'place_order' %}" class="btn btn-success btn-lg w-100 mt-4">
+          <i class="fas fa-lock me-2" aria-hidden="true"></i>Proceed to Checkout
+        </a>
+        <p class="small text-muted text-center mt-3 mb-0">Payment options are selected at checkout.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+{% else %}
+<div class="empty-state">
+  <span class="empty-state-icon"><i class="fas fa-cart-shopping" aria-hidden="true"></i></span>
+  <h2 class="h4">Your cart is empty</h2>
+  <p class="text-muted">Add fresh produce from the marketplace to get started.</p>
+  <a href="{% url 'marketplace' %}" class="btn btn-success">Browse Marketplace</a>
+</div>
+{% endif %}

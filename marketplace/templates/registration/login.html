@@ -1,102 +1,91 @@
 {% extends 'base.html' %}
-{% block title %}Login{% endblock %}
+{% load static %}
+{% block title %}Log in{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center py-4">
-  <div class="col-md-6 col-lg-5">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-success text-white text-center py-3">
-        <h3 class="mb-0"><i class="fas fa-seedling me-2"></i>Welcome Back</h3>
-        <p class="mb-0 small">Login to continue to your E-Agro account</p>
-      </div>
-      <div class="card-body p-4">
-        {% if form.errors %}
-        <div class="alert alert-danger py-2">
-          <small>Invalid username or password. Please try again.</small>
-        </div>
-        {% endif %}
-
-        <form method="post" novalidate>
-          {% csrf_token %}
-
-          <div class="mb-3">
-            <label for="id_username" class="form-label fw-bold">Username or Email</label>
-            <div class="input-group">
-              <span class="input-group-text bg-white"><i class="fas fa-user text-success"></i></span>
-              <input type="text" name="username" id="id_username"
-                     class="form-control" required autofocus autocomplete="username"
-                     placeholder="Enter your username">
+<div class="row justify-content-center">
+  <div class="col-md-10 col-lg-9">
+    <div class="auth-card">
+      <div class="row g-0">
+        <div class="col-md-5 d-none d-md-block">
+          <aside class="auth-aside h-100">
+            <div class="auth-aside-content">
+              <span class="hero-badge"><i class="fas fa-leaf" aria-hidden="true"></i>Welcome back</span>
+              <h2>Fresh produce is waiting.</h2>
+              <p class="mb-0">Log in to order directly from farmers or manage your latest harvest.</p>
             </div>
-          </div>
+          </aside>
+        </div>
+        <div class="col-md-7">
+          <div class="auth-form">
+            <span class="eyebrow">Your E-Agro account</span>
+            <h1 class="mb-2">Log in</h1>
+            <p class="text-muted mb-4">Enter your details to continue.</p>
 
-          <div class="mb-3">
-            <label for="id_password" class="form-label fw-bold">Password</label>
-            <div class="input-group">
-              <span class="input-group-text bg-white"><i class="fas fa-lock text-success"></i></span>
-              <input type="password" name="password" id="id_password"
-                     class="form-control" required autocomplete="current-password"
-                     placeholder="Enter your password">
-              <button class="btn btn-outline-secondary" type="button"
-                      onclick="togglePassword('id_password', this)">
-                <i class="fas fa-eye"></i>
+            {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+              {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+              {% if not form.non_field_errors %}<div>Please check your username and password.</div>{% endif %}
+            </div>
+            {% endif %}
+
+            <form method="post">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="id_username" class="form-label">Username or email</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-user" aria-hidden="true"></i></span>
+                  <input type="text" name="username" id="id_username"
+                         class="form-control{% if form.username.errors %} is-invalid{% endif %}"
+                         value="{{ form.username.value|default:'' }}" required autofocus
+                         autocomplete="username" placeholder="Enter your username">
+                  {% if form.username.errors %}<div class="invalid-feedback">{{ form.username.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="id_password" class="form-label">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-lock" aria-hidden="true"></i></span>
+                  <input type="password" name="password" id="id_password"
+                         class="form-control{% if form.password.errors %} is-invalid{% endif %}"
+                         required autocomplete="current-password" placeholder="Enter your password">
+                  <button class="btn btn-outline-secondary" type="button" id="toggle-password"
+                          aria-label="Show password" aria-controls="id_password">
+                    <i class="fas fa-eye" aria-hidden="true"></i>
+                  </button>
+                  {% if form.password.errors %}<div class="invalid-feedback">{{ form.password.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+
+              {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+              <button type="submit" class="btn btn-success btn-lg w-100">
+                <i class="fas fa-arrow-right-to-bracket me-2" aria-hidden="true"></i>Log in
               </button>
-            </div>
+            </form>
+
+            <p class="text-center text-muted mt-4 mb-0">
+              New to E-Agro? <a href="{% url 'register' %}" class="text-success fw-bold text-decoration-none">Create an account</a>
+            </p>
           </div>
-
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="remember">
-              <label class="form-check-label small" for="remember">Remember me</label>
-            </div>
-            <a href="#" class="text-success small">Forgot password?</a>
-          </div>
-
-          {% if next %}
-            <input type="hidden" name="next" value="{{ next }}">
-          {% endif %}
-
-          <button type="submit" class="btn btn-success w-100 py-2">
-            <i class="fas fa-sign-in-alt me-2"></i>Log In
-          </button>
-        </form>
-
-        <div class="text-center mt-4">
-          <p class="mb-0 small">
-            Don't have an account?
-            <a href="{% url 'register' %}" class="text-success fw-bold">Register Now</a>
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-4 text-center">
-      <div class="d-flex justify-content-center gap-4">
-        <div class="border-end pe-4">
-          <h6 class="text-success mb-1"><i class="fas fa-tractor me-1"></i>Farmers</h6>
-          <p class="small text-muted mb-0">Manage products & track orders</p>
-        </div>
-        <div>
-          <h6 class="text-success mb-1"><i class="fas fa-shopping-basket me-1"></i>Buyers</h6>
-          <p class="small text-muted mb-0">Browse fresh produce</p>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
 <script>
-function togglePassword(id, btn) {
-  const input = document.getElementById(id);
-  const icon = btn.querySelector('i');
-  if (input.type === 'password') {
-    input.type = 'text';
-    icon.classList.remove('fa-eye');
-    icon.classList.add('fa-eye-slash');
-  } else {
-    input.type = 'password';
-    icon.classList.remove('fa-eye-slash');
-    icon.classList.add('fa-eye');
-  }
-}
+  const passwordInput = document.getElementById('id_password');
+  const passwordToggle = document.getElementById('toggle-password');
+  passwordToggle.addEventListener('click', () => {
+    const showPassword = passwordInput.type === 'password';
+    passwordInput.type = showPassword ? 'text' : 'password';
+    passwordToggle.setAttribute('aria-label', showPassword ? 'Hide password' : 'Show password');
+    passwordToggle.querySelector('i').className = showPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+  });
 </script>
 {% endblock %}

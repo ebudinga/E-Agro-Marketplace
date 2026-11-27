@@ -1,99 +1,118 @@
 {% extends 'base.html' %}
+{% load humanize %}
+{% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="max-height: 500px; object-fit: cover;">
-            </div>
-        </div>
-        
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="card-title">{{ product.name }}</h2>
-                    <p class="text-success fs-4">₦ {{ product.price }} per kg</p>
-                    
-                    <div class="d-flex justify-content-between mb-3">
-                        <div>
-                            <span class="farmer-badge">Farmer</span>
-                            <strong>{{ product.farmer.username }}</strong>
-                        </div>
-                        <div>
-                            <span class="badge bg-{% if product.is_available %}success{% else %}danger{% endif %}">
-                                {% if product.is_available %}Available{% else %}Out of Stock{% endif %}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <p class="card-text">{{ product.description }}</p>
-                    
-                    <div class="mb-4">
-                        <h5>Product Details</h5>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">
-                                <strong>Available Quantity:</strong> {{ product.quantity }} kg
-                            </li>
-                            <li class="list-group-item">
-                                <strong>Added:</strong> {{ product.created_at|date:"M d, Y" }}
-                            </li>
-                            <li class="list-group-item">
-                                <strong>Location:</strong> {{ product.farmer.location }}
-                            </li>
-                            {% if product.category %}
-                            <li class="list-group-item">
-                                <strong>Category:</strong> {{ product.category.name }}
-                            </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                    
-                    {% if user.is_authenticated and user.is_buyer and product.is_available %}
-                        <div class="border-top pt-3">
-                            <h5>Add to Cart</h5>
-                            <form method="post" action="{% url 'add_to_cart' product.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-success w-100 mt-3">
-                                    <i class="fas fa-cart-plus me-2"></i>Add to Cart
-                                </button>
-                            </form>
-                        </div>
-                    {% elif not product.is_available %}
-                        <div class="alert alert-warning">
-                            This product is currently out of stock. Please check back later.
-                        </div>
-                    {% elif not user.is_authenticated %}
-                        <div class="alert alert-info">
-                            <a href="{% url 'login' %}?next={% url 'product_detail' product.id %}" class="alert-link">
-                                Login as a buyer
-                            </a> to purchase this product.
-                        </div>
-                    {% endif %}
-                    
-                    {% if user.is_authenticated and user == product.farmer %}
-                        <div class="border-top pt-3">
-                            <h5>Farmer Actions</h5>
-                            <div class="d-grid gap-2">
-                                <a href="{% url 'edit_product' product.id %}" class="btn btn-outline-primary">
-                                    <i class="fas fa-edit me-2"></i>Edit Product
-                                </a>
-                                <a href="{% url 'delete_product' product.id %}" class="btn btn-outline-danger">
-                                    <i class="fas fa-trash me-2"></i>Delete Product
-                                </a>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+<nav aria-label="Breadcrumb" class="mb-4">
+  <ol class="breadcrumb mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'marketplace' %}" class="text-decoration-none">Marketplace</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+  </ol>
+</nav>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="product-gallery">
+      <img src="{{ product.image.url }}" alt="{{ product.name }}" fetchpriority="high">
     </div>
-    
-    <!-- Back button -->
-    <div class="mt-4">
-        <a href="{% url 'marketplace' %}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Back to Marketplace
-        </a>
-    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <article class="detail-panel h-100">
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        {% if product.category %}<span class="availability-badge">{{ product.category.name }}</span>{% endif %}
+        <span class="availability-badge {% if not product.is_available %}unavailable{% endif %}">
+          <i class="fas fa-{% if product.is_available %}circle-check{% else %}circle-xmark{% endif %}" aria-hidden="true"></i>
+          {% if product.is_available %}Available now{% else %}Out of stock{% endif %}
+        </span>
+      </div>
+
+      <h1 class="mb-2">{{ product.name }}</h1>
+      <p class="detail-price mb-4">₦{{ product.price|floatformat:2|intcomma }} <small>/ kg</small></p>
+
+      <div class="seller-card">
+        <span class="nav-avatar" aria-hidden="true">{{ product.farmer.username|slice:":1"|upper }}</span>
+        <div class="flex-grow-1">
+          <div class="small text-muted">Sold directly by</div>
+          <strong>{{ product.farmer.username }}</strong>
+          {% if product.farmer.location %}
+          <div class="small text-muted"><i class="fas fa-location-dot me-1" aria-hidden="true"></i>{{ product.farmer.location }}</div>
+          {% endif %}
+        </div>
+        <i class="fas fa-seedling text-success" aria-hidden="true"></i>
+      </div>
+
+      <p class="text-muted">{{ product.description }}</p>
+
+      <div class="detail-list">
+        <div><span>Available quantity</span><strong>{{ product.quantity }} kg</strong></div>
+        <div><span>Category</span><strong>{{ product.category.name|default:"Uncategorised" }}</strong></div>
+        <div><span>Listed</span><strong>{{ product.created_at|date:"M d, Y" }}</strong></div>
+      </div>
+
+      {% if user.is_authenticated and user.is_buyer and product.is_available %}
+      <form method="post" action="{% url 'add_to_cart' product.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success btn-lg w-100">
+          <i class="fas fa-cart-plus me-2" aria-hidden="true"></i>Add to Cart
+        </button>
+      </form>
+      {% if product.farmer.phone_number %}
+      <a class="btn btn-outline-success w-100 mt-2" target="_blank" rel="noopener noreferrer"
+         href="https://wa.me/{{ product.farmer.phone_number }}?text=Hi%20{{ product.farmer.username|urlencode }}%2C%20I%27m%20interested%20in%20{{ product.name|urlencode }}">
+        <i class="fab fa-whatsapp me-2" aria-hidden="true"></i>Chat with Farmer
+      </a>
+      {% endif %}
+      {% elif not product.is_available %}
+      <div class="alert alert-warning mb-0">This produce is currently out of stock. Please check back later.</div>
+      {% elif not user.is_authenticated %}
+      <div class="alert alert-info mb-0">
+        <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">Log in as a buyer</a> to purchase this produce.
+      </div>
+      {% endif %}
+
+      {% if user.is_authenticated and user == product.farmer %}
+      <div class="d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+        <a href="{% url 'edit_product' product.id %}" class="btn btn-outline-primary flex-grow-1"><i class="fas fa-pen me-2" aria-hidden="true"></i>Edit</a>
+        <a href="{% url 'delete_product' product.id %}" class="btn btn-outline-danger flex-grow-1"><i class="fas fa-trash me-2" aria-hidden="true"></i>Delete</a>
+      </div>
+      {% endif %}
+    </article>
+  </div>
 </div>
+
+{% if related_products %}
+<section class="mt-5">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">Same farmer</span>
+      <h2>More from {{ product.farmer.username }}</h2>
+    </div>
+  </div>
+  <div class="row g-4">
+    {% for related_product in related_products %}
+    <div class="col-12 col-sm-6 col-xl-3">
+      <article class="card product-card h-100">
+        <div class="product-media">
+          <a href="{% url 'product_detail' related_product.id %}" aria-label="View {{ related_product.name }}">
+            <img src="{{ related_product.image.url }}" alt="{{ related_product.name }}" loading="lazy">
+          </a>
+        </div>
+        <div class="card-body">
+          <h3 class="product-title">{{ related_product.name }}</h3>
+          <p class="product-price mb-0">₦{{ related_product.price|floatformat:2|intcomma }} <small>/ kg</small></p>
+        </div>
+        <div class="card-footer">
+          <a href="{% url 'product_detail' related_product.id %}" class="btn btn-sm btn-outline-success w-100">View produce</a>
+        </div>
+      </article>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<a href="{% url 'marketplace' %}" class="btn btn-outline-secondary mt-4">
+  <i class="fas fa-arrow-left me-2" aria-hidden="true"></i>Back to Marketplace
+</a>
 {% endblock %}

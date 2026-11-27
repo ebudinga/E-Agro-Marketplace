@@ -543,6 +543,7 @@ def buyer_dashboard(request):
 
     orders = Order.objects.filter(buyer=request.user).select_related('product', 'product__farmer')
     total_spent = orders.aggregate(total=Sum('total_price'))['total'] or 0
+    delivered_orders = orders.filter(status='DELIVERED').count()
 
     favorite_farmers = CustomUser.objects.filter(
         products__orders__buyer=request.user, user_type='FARMER'
@@ -551,5 +552,6 @@ def buyer_dashboard(request):
     return render(request, 'marketplace/buyer_dashboard.html', {
         'orders': orders,
         'total_spent': total_spent,
+        'delivered_orders': delivered_orders,
         'favorite_farmers': favorite_farmers,
     })

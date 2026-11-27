@@ -1,109 +1,143 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static humanize %}
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<section class="rounded-4 p-5 mb-5 text-white position-relative overflow-hidden"
-         style="background:linear-gradient(135deg,#28a745 0%,#1e7e34 100%);">
-  <div class="row align-items-center">
+<section class="hero-panel">
+  <div class="row align-items-center g-4 g-lg-5">
     <div class="col-lg-7">
-      <h1 class="display-4 fw-bold mb-3">Connecting Farmers Directly to Buyers</h1>
+      <span class="hero-badge"><i class="fas fa-leaf" aria-hidden="true"></i>Farm fresh. Fairly traded.</span>
+      <h1>Good food starts with a direct connection.</h1>
       <p class="lead mb-4">
-        E-Agro eliminates middlemen, reduces post-harvest losses, and boosts farmer profits
-        while giving buyers fresh, affordable produce.
+        Discover fresh produce from local farmers, support fairer prices, and bring the best of the harvest straight to your table.
       </p>
       <div class="d-flex flex-wrap gap-3">
-        <a href="{% url 'register' %}" class="btn btn-light btn-lg fw-bold px-4">
-          <i class="fas fa-tractor me-2"></i>Join as Farmer
+        {% if user.is_authenticated %}
+        <a href="{% url 'marketplace' %}" class="btn btn-light btn-lg fw-bold">
+          <i class="fas fa-shopping-basket me-2" aria-hidden="true"></i>Browse Marketplace
         </a>
-        <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg fw-bold px-4">
-          <i class="fas fa-shopping-basket me-2"></i>Shop as Buyer
+        {% else %}
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg fw-bold">
+          <i class="fas fa-shopping-basket me-2" aria-hidden="true"></i>Shop as a Buyer
         </a>
+        <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg fw-bold">
+          <i class="fas fa-tractor me-2" aria-hidden="true"></i>Join as a Farmer
+        </a>
+        {% endif %}
       </div>
     </div>
-    <div class="col-lg-5 d-none d-lg-block">
-      <img src="{% static 'images/farm1.jpg' %}" class="img-fluid rounded-4 shadow-lg"
-           style="max-height:340px;object-fit:cover;width:100%;" alt="Fresh farm produce">
+    <div class="col-lg-5">
+      <div class="position-relative">
+        <div class="hero-image-frame">
+          <img src="{% static 'images/farm1.jpg' %}" alt="A lush green farm field ready for harvest" fetchpriority="high">
+        </div>
+        <div class="hero-image-caption">
+          <i class="fas fa-seedling" aria-hidden="true"></i>
+          Direct from local farmers
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="mb-5">
+<section class="trust-strip" aria-label="Why shop with E-Agro">
+  <div class="trust-item"><i class="fas fa-handshake" aria-hidden="true"></i>Farmer-direct trading</div>
+  <div class="trust-item"><i class="fas fa-shield-halved" aria-hidden="true"></i>Secure checkout</div>
+  <div class="trust-item"><i class="fas fa-truck-fast" aria-hidden="true"></i>Fresh produce, delivered</div>
+</section>
+
+<section class="mb-5 pb-2">
   <div class="text-center mb-4">
-    <h2 class="fw-bold">How E-Agro Works</h2>
-    <p class="text-muted">Simple. Direct. Fair.</p>
+    <span class="eyebrow">Simple by design</span>
+    <h2>From the farm to you</h2>
+    <p class="text-muted">Three easy steps. No unnecessary middlemen.</p>
   </div>
   <div class="row g-4">
     <div class="col-md-4">
-      <div class="card border-0 shadow-sm h-100 text-center p-4">
-        <div class="display-5 text-success mb-3"><i class="fas fa-seedling"></i></div>
-        <h5>Farmers List Products</h5>
-        <p class="text-muted mb-0">Farmers add fresh produce with photos, prices and quantity.</p>
+      <div class="card step-card h-100">
+        <span class="step-number" aria-hidden="true">01</span>
+        <span class="step-icon"><i class="fas fa-seedling" aria-hidden="true"></i></span>
+        <h3>Farmers list their harvest</h3>
+        <p class="text-muted mb-0">Share fresh produce with clear photos, prices, and available quantities.</p>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="card border-0 shadow-sm h-100 text-center p-4">
-        <div class="display-5 text-success mb-3"><i class="fas fa-mobile-alt"></i></div>
-        <h5>Buyers Place Orders</h5>
-        <p class="text-muted mb-0">Browse, order, and pay securely with Paystack.</p>
+      <div class="card step-card h-100">
+        <span class="step-number" aria-hidden="true">02</span>
+        <span class="step-icon"><i class="fas fa-mobile-screen-button" aria-hidden="true"></i></span>
+        <h3>Buyers order directly</h3>
+        <p class="text-muted mb-0">Browse the marketplace, choose your produce, and check out securely.</p>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="card border-0 shadow-sm h-100 text-center p-4">
-        <div class="display-5 text-success mb-3"><i class="fas fa-truck"></i></div>
-        <h5>Direct Delivery</h5>
-        <p class="text-muted mb-0">Farmers deliver fresh produce straight to buyers.</p>
+      <div class="card step-card h-100">
+        <span class="step-number" aria-hidden="true">03</span>
+        <span class="step-icon"><i class="fas fa-truck-fast" aria-hidden="true"></i></span>
+        <h3>Fresh produce arrives</h3>
+        <p class="text-muted mb-0">Farmers fulfil your order and stay in touch throughout delivery.</p>
       </div>
     </div>
   </div>
 </section>
 
 <section class="mb-5">
-  <div class="d-flex justify-content-between align-items-end mb-4">
+  <div class="section-heading">
     <div>
-      <h2 class="fw-bold mb-1">Fresh Farm Produce</h2>
-      <p class="text-muted mb-0">Direct from our partner farmers</p>
+      <span class="eyebrow">Fresh from the field</span>
+      <h2>Featured produce</h2>
+      <p class="text-muted">A little of what our partner farmers have harvested.</p>
     </div>
     <a href="{% url 'marketplace' %}" class="btn btn-outline-success">
-      View All <i class="fas fa-arrow-right ms-1"></i>
+      View all <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
     </a>
   </div>
 
   <div class="row g-4">
     {% for product in products %}
-    <div class="col-md-4 col-lg-3">
-      <div class="card product-card border-0 shadow-sm h-100">
-        <div class="position-relative">
-          <img src="{{ product.image.url }}" class="card-img-top"
-               alt="{{ product.name }}" style="height:180px;object-fit:cover;">
-          <span class="badge bg-success position-absolute top-0 end-0 m-2">Fresh</span>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <article class="card product-card h-100">
+        <div class="product-media">
+          <a href="{% url 'product_detail' product.id %}" aria-label="View {{ product.name }}">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
+          </a>
+          <span class="category-badge position-absolute top-0 end-0 m-3">Fresh</span>
         </div>
         <div class="card-body">
-          <h6 class="fw-bold mb-1">{{ product.name }}</h6>
-          <p class="text-success fw-bold mb-1">₦{{ product.price }}<small class="text-muted">/kg</small></p>
-          <p class="small text-muted mb-2">
-            <i class="fas fa-user-tie me-1"></i>{{ product.farmer.username }}
-          </p>
-          <a href="{% url 'product_detail' product.id %}" class="btn btn-sm btn-outline-success w-100">
-            View Details
+          <h3 class="product-title"><a class="text-decoration-none text-reset" href="{% url 'product_detail' product.id %}">{{ product.name }}</a></h3>
+          <p class="product-price">₦{{ product.price|floatformat:2|intcomma }} <small>/ kg</small></p>
+          <p class="product-meta"><i class="fas fa-user-tie" aria-hidden="true"></i>{{ product.farmer.username }}</p>
+          {% if product.farmer.location %}
+          <p class="product-meta"><i class="fas fa-location-dot" aria-hidden="true"></i>{{ product.farmer.location }}</p>
+          {% endif %}
+        </div>
+        <div class="card-footer">
+          <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-success w-100">
+            View produce <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
           </a>
         </div>
-      </div>
+      </article>
     </div>
     {% empty %}
     <div class="col-12">
-      <div class="alert alert-info text-center mb-0">
-        No products yet. Check back soon!
+      <div class="empty-state">
+        <span class="empty-state-icon"><i class="fas fa-basket-shopping" aria-hidden="true"></i></span>
+        <h3>Fresh produce is on its way</h3>
+        <p class="text-muted">Check back soon to see what our farmers have harvested.</p>
+        <a href="{% url 'register' %}" class="btn btn-success">Join the marketplace</a>
       </div>
     </div>
     {% endfor %}
   </div>
 </section>
 
-<section class="rounded-4 p-5 text-center text-white mb-5"
-         style="background:linear-gradient(135deg,#1e7e34 0%,#28a745 100%);">
-  <h2 class="fw-bold mb-3">Join E-Agro Marketplace Today</h2>
-  <p class="lead mb-4">Sell smarter. Buy fresher. Support local farmers.</p>
-  <a href="{% url 'register' %}" class="btn btn-light btn-lg fw-bold px-5">Get Started</a>
+<section class="cta-panel">
+  <div class="position-relative" style="z-index: 1;">
+    <span class="eyebrow">Grow with E-Agro</span>
+    <h2 class="mb-3">Have a harvest to share?</h2>
+    <p class="text-muted mb-4">Reach more buyers, manage your products, and keep more of every sale.</p>
+    <a href="{% url 'register' %}" class="btn btn-success btn-lg">
+      <i class="fas fa-tractor me-2" aria-hidden="true"></i>Start Selling
+    </a>
+  </div>
 </section>
 {% endblock %}
